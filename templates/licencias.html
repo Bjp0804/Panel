@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Licencias{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Gestión de Licencias</h2>
+    <a href="{{ url_for('nueva_licencia') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Nueva Licencia
+    </a>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Plataforma</th>
+                        <th>Software</th>
+                        <th>Clave</th>
+                        <th>Inicio</th>
+                        <th>Expiración</th>
+                        <th>Estado</th>
+                        <th>Notas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for licencia in licencias %}
+                    <tr class="{% if licencia.fecha_expiracion < datetime.utcnow() %}table-danger{% 
+                               elif (licencia.fecha_expiracion - datetime.utcnow()).days <= 5 %}table-warning{% endif %}">
+                        <td>{{ licencia.id }}</td>
+                        <td>
+                            <a href="{{ url_for('licencias_cliente', id=licencia.cliente.id) }}" 
+                               class="text-decoration-none">
+                                {{ licencia.cliente.nombre }}
+                            </a>
+                        </td>
+                        <td><span class="badge bg-info">{{ licencia.cliente.plataforma }}</span></td>
+                        <td>{{ licencia.tipo_software }}</td>
+                        <td>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-sm" 
+                                       value="{{ licencia.clave_licencia }}" readonly>
+                                <button class="btn btn-outline-secondary btn-sm" type="button"
+                                        onclick="copyToClipboard('{{ licencia.clave_licencia }}')"
+                                        title="Copiar clave">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td>{{ licencia.fecha_inicio.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ licencia.fecha_expiracion.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            <span class="badge {% if licencia.estado == 'Activa' %}bg-success{% 
+                                              elif licencia.estado == 'Expirada' %}bg-danger{% 
+                                              else %}bg-secondary{% endif %}">
+                                {{ licencia.estado }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if licencia.notas %}
+                            <span class="text-truncate d-inline-block" style="max-width: 150px;" 
+                                  title="{{ licencia.notas }}">
+                                {{ licencia.notas }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('editar_licencia', id=licencia.id) }}" 
+                                   class="btn btn-warning btn-sm" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button onclick="confirmarEliminarLicencia({{ licencia.id }})" 
+                                        class="btn btn-danger btn-sm" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function confirmarEliminarLicencia(id) {
+    if (confirm('¿Está seguro de que desea eliminar esta licencia?')) {
+        window.location.href = "{{ url_for('eliminar_licencia', id=0) }}".replace('0', id);
+    }
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Clave copiada al portapapeles');
+    }).catch(function(err) {
+        console.error('Error al copiar:', err);
+    });
+}
+</script>
+{% endblock %}
+{% endblock %}

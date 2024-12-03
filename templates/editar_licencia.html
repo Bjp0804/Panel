@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Editar Licencia{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-warning">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-edit me-2"></i>Editar Licencia
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('editar_licencia', id=licencia.id) }}">
+                    <div class="mb-3">
+                        <label for="cliente_id" class="form-label">Cliente</label>
+                        <select class="form-select" id="cliente_id" name="cliente_id" required>
+                            {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}" 
+                                    {% if cliente.id == licencia.cliente_id %}selected{% endif %}>
+                                {{ cliente.nombre }} - {{ cliente.plataforma }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipo_software" class="form-label">Tipo de Software</label>
+                        <input type="text" class="form-control" id="tipo_software" name="tipo_software" 
+                               value="{{ licencia.tipo_software }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="clave_licencia" class="form-label">Clave de Licencia</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="clave_licencia" name="clave_licencia" 
+                                   value="{{ licencia.clave_licencia }}" required>
+                            <button class="btn btn-outline-secondary" type="button" 
+                                    onclick="copyToClipboard('{{ licencia.clave_licencia }}')" 
+                                    title="Copiar clave">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" 
+                                   value="{{ licencia.fecha_inicio.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha_expiracion" class="form-label">Fecha de Expiración</label>
+                            <input type="date" class="form-control" id="fecha_expiracion" name="fecha_expiracion" 
+                                   value="{{ licencia.fecha_expiracion.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="estado" class="form-label">Estado</label>
+                        <select class="form-select" id="estado" name="estado" required>
+                            <option value="Activa" {% if licencia.estado == 'Activa' %}selected{% endif %}>Activa</option>
+                            <option value="Expirada" {% if licencia.estado == 'Expirada' %}selected{% endif %}>Expirada</option>
+                            <option value="Cancelada" {% if licencia.estado == 'Cancelada' %}selected{% endif %}>Cancelada</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notas" class="form-label">Notas</label>
+                        <textarea class="form-control" id="notas" name="notas" rows="3">{{ licencia.notas }}</textarea>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('licencias') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-2"></i>Actualizar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Clave copiada al portapapeles');
+    }).catch(function(err) {
+        console.error('Error al copiar:', err);
+    });
+}
+</script>
+{% endblock %}
+{% endblock %}

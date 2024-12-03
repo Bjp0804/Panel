@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Clientes{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Gestión de Clientes</h2>
+    <a href="{{ url_for('nuevo_cliente') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Nuevo Cliente
+    </a>
+</div>
+
+<div class="card shadow">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Plataforma</th>
+                        <th>Nota</th>
+                        <th>Fecha Registro</th>
+                        <th>Licencias Activas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr>
+                        <td>{{ cliente.id }}</td>
+                        <td>{{ cliente.nombre }}</td>
+                        <td>{{ cliente.email }}</td>
+                        <td>{{ cliente.telefono }}</td>
+                        <td><span class="badge bg-info">{{ cliente.plataforma }}</span></td>
+                        <td>
+                            {% if cliente.nota %}
+                            <span class="text-truncate d-inline-block" style="max-width: 150px;" 
+                                  title="{{ cliente.nota }}">
+                                {{ cliente.nota }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ cliente.fecha_registro.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            <span class="badge bg-primary">{{ cliente.licencias|length }}</span>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ url_for('licencias_cliente', id=cliente.id) }}" 
+                                   class="btn btn-info btn-sm" title="Ver Licencias">
+                                    <i class="fas fa-key"></i>
+                                </a>
+                                <a href="{{ url_for('editar_cliente', id=cliente.id) }}" 
+                                   class="btn btn-warning btn-sm" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button onclick="confirmarEliminarCliente({{ cliente.id }})" 
+                                        class="btn btn-danger btn-sm" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+function confirmarEliminarCliente(id) {
+    if (confirm('¿Está seguro de que desea eliminar este cliente? Esta acción también eliminará todas sus licencias asociadas.')) {
+        window.location.href = "{{ url_for('eliminar_cliente', id=0) }}".replace('0', id);
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

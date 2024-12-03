@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Editar Cliente{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-warning">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-user-edit me-2"></i>Editar Cliente
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('editar_cliente', id=cliente.id) }}">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" 
+                               value="{{ cliente.nombre }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               value="{{ cliente.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="telefono" class="form-label">Teléfono</label>
+                        <input type="tel" class="form-control" id="telefono" name="telefono" 
+                               value="{{ cliente.telefono }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="plataforma" class="form-label">Plataforma</label>
+                        <select class="form-select" id="plataforma" name="plataforma" required>
+                            <option value="">Seleccione una plataforma</option>
+                            <option value="Windows" {% if cliente.plataforma == 'Windows' %}selected{% endif %}>Windows</option>
+                            <option value="Mac" {% if cliente.plataforma == 'Mac' %}selected{% endif %}>Mac</option>
+                            <option value="Linux" {% if cliente.plataforma == 'Linux' %}selected{% endif %}>Linux</option>
+                            <option value="Android" {% if cliente.plataforma == 'Android' %}selected{% endif %}>Android</option>
+                            <option value="iOS" {% if cliente.plataforma == 'iOS' %}selected{% endif %}>iOS</option>
+                            <option value="Web" {% if cliente.plataforma == 'Web' %}selected{% endif %}>Web</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nota" class="form-label">Nota</label>
+                        <textarea class="form-control" id="nota" name="nota" rows="3">{{ cliente.nota }}</textarea>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('clientes') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-save me-2"></i>Actualizar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

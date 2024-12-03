@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}404 - Página no encontrada{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 text-center">
+        <div class="error-template">
+            <h1 class="display-1 text-muted">404</h1>
+            <h2 class="display-4">¡Oops!</h2>
+            <h3 class="mb-4">Página no encontrada</h3>
+            <div class="error-details mb-4">
+                Lo sentimos, la página que estás buscando no existe o ha sido movida.
+            </div>
+            <div class="error-actions">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-home me-2"></i>Volver al Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
