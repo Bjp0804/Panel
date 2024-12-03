@@ -239,6 +239,31 @@ def eliminar_licencia(id):
         flash('Error al eliminar la licencia', 'danger')
     return redirect(url_for('licencias'))
 
+@app.route('/crear-admin')
+def crear_admin():
+    try:
+        # Crear todas las tablas si no existen
+        db.create_all()
+        
+        # Verificar si existe el usuario admin
+        admin = Usuario.query.filter_by(username='tecnoplus').first()
+        if not admin:
+            # Crear usuario admin
+            admin = Usuario(
+                username='tecnoplus',
+                password_hash=generate_password_hash('admintecno')
+            )
+            db.session.add(admin)
+            db.session.commit()
+            flash('Usuario administrador creado exitosamente', 'success')
+        else:
+            flash('El usuario administrador ya existe', 'info')
+        return redirect(url_for('login'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al crear el administrador: {str(e)}', 'danger')
+        return redirect(url_for('login'))
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
