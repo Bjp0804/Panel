@@ -252,11 +252,11 @@ if __name__ == '__main__':
     with app.app_context():
         try:
             auto_upgrade_db()
-            admin = Usuario.query.filter_by(username='admin').first()
+            admin = Usuario.query.filter_by(username='tecnoplus').first()
             if not admin:
                 admin = Usuario(
-                    username='admin',
-                    password_hash=generate_password_hash('admin123')
+                    username='tecnoplus',
+                    password_hash=generate_password_hash('admintecno')
                 )
                 db.session.add(admin)
                 db.session.commit()
