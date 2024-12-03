@@ -3,10 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_migrate import Migrate
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tu_clave_secreta_aqui')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'db7710cdf3c463e9f32095b6bccfde53')
 
 # Configuración de la base de datos PostgreSQL
 database_url = os.environ.get('DATABASE_URL', 'postgresql://postgres.nlugycdfwsdnqtxbhngw:qewooqkQ,dsp23@aws-0-us-west-1.pooler.supabase.com:6543/postgres')
@@ -17,9 +18,19 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+def auto_upgrade_db():
+    with app.app_context():
+        db.create_all()
+        try:
+            from flask_migrate import upgrade
+            upgrade()
+        except Exception as e:
+            print(f"Error en migración: {e}")
 
 @app.context_processor
 def inject_datetime():
@@ -64,17 +75,14 @@ def load_user(user_id):
 def dashboard():
     total_clientes = Cliente.query.count()
     total_licencias = Licencia.query.count()
-    
     fecha_limite = datetime.utcnow() + timedelta(days=5)
     licencias_por_expirar = Licencia.query.filter(
         Licencia.fecha_expiracion.between(datetime.utcnow(), fecha_limite)
     ).count()
-    
     licencias_expiradas = Licencia.query.filter(
         Licencia.fecha_expiracion < datetime.utcnow()
     ).count()
-    
-    return render_template('dashboard.html',
+    return render_template('dashboard.html', 
                          total_clientes=total_clientes,
                          total_licencias=total_licencias,
                          licencias_por_expirar=licencias_por_expirar,
@@ -84,12 +92,10 @@ def dashboard():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
-    
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         user = Usuario.query.filter_by(username=username).first()
-        
         if user and check_password_hash(user.password_hash, password):
             login_user(user)
             next_page = request.args.get('next')
@@ -233,32 +239,6 @@ def eliminar_licencia(id):
         flash('Error al eliminar la licencia', 'danger')
     return redirect(url_for('licencias'))
 
-@app.route('/crear-admin')
-def crear_admin():
-    try:
-        # Crear todas las tablas si no existen
-        db.create_all()
-        
-        # Verificar si existe el usuario admin
-        admin = Usuario.query.filter_by(username='admin').first()
-        if not admin:
-            # Crear usuario admin
-            admin = Usuario(
-                username='admin',
-                password_hash=generate_password_hash('admin123')
-            )
-            db.session.add(admin)
-            db.session.commit()
-            flash('Usuario administrador creado exitosamente', 'success')
-        else:
-            flash('El usuario administrador ya existe', 'info')
-        
-        return redirect(url_for('login'))
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error al crear el administrador: {str(e)}', 'danger')
-        return redirect(url_for('login'))
-
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
@@ -271,13 +251,9 @@ def internal_error(error):
 if __name__ == '__main__':
     with app.app_context():
         try:
-            # Crear todas las tablas
-            db.create_all()
-            
-            # Verificar si existe el usuario admin
+            auto_upgrade_db()
             admin = Usuario.query.filter_by(username='admin').first()
             if not admin:
-                # Crear usuario admin
                 admin = Usuario(
                     username='admin',
                     password_hash=generate_password_hash('admin123')
