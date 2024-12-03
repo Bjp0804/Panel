@@ -1,0 +1,65 @@
+/* Estilos personalizados para el dashboard */
+.border-left-primary {
+    border-left: .25rem solid #4e73df!important;
+}
+
+.border-left-success {
+    border-left: .25rem solid #1cc88a!important;
+}
+
+.border-left-warning {
+    border-left: .25rem solid #f6c23e!important;
+}
+
+.border-left-danger {
+    border-left: .25rem solid #e74a3b!important;
+}
+
+.text-gray-300 {
+    color: #dddfeb!important;
+}
+
+.text-gray-800 {
+    color: #5a5c69!important;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+/* Mejoras visuales generales */
+.table > :not(caption) > * > * {
+    padding: 0.75rem;
+}
+
+.input-group-sm > .form-control {
+    font-size: 0.875rem;
+}
+
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Estilos para las tarjetas del dashboard */
+.card {
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    padding: 0.75rem 1.25rem;
+}
+
+/* Mejoras en la responsividad */
+@media (max-width: 768px) {
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 0.25rem;
+    }
+}
