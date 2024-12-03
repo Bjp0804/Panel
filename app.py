@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'tu_clave_secreta_aqui')
 
 # Configuración de la base de datos PostgreSQL
-database_url = os.environ.get('DATABASE_URL', 'postgresql://postgres.ikhqhyeufcoeclkzvxzj:CJQi58YLgpDEJ7vb@aws-0-us-west-1.pooler.supabase.com:6543/postgres')
+database_url = os.environ.get('DATABASE_URL', 'postgresql://postgres.nlugycdfwsdnqtxbhngw:qewooqkQ,dsp23@aws-0-us-west-1.pooler.supabase.com:6543/postgres')
 if database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
