@@ -4,18 +4,24 @@ from datetime import datetime, timedelta
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
+from telethon import TelegramClient
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'db7710cdf3c463e9f32095b6bccfde53')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 # Configuración de la base de datos PostgreSQL
-database_url = os.environ.get('DATABASE_URL', 'postgresql://postgres.nlugycdfwsdnqtxbhngw:qewooqkQ,dsp23@aws-0-us-west-1.pooler.supabase.com:6543/postgres')
+database_url = os.environ.get('DATABASE_URL')
 if database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Configuración de Telegram
+client = TelegramClient('backup_session', 
+                       os.environ.get('TELEGRAM_API_ID'), 
+                       os.environ.get('TELEGRAM_API_HASH'))
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -64,6 +70,15 @@ class Licencia(db.Model):
     fecha_expiracion = db.Column(db.DateTime, nullable=False)
     estado = db.Column(db.String(20), default='Activa')
     notas = db.Column(db.Text)
+
+class ArchivoTelegram(db.Model):
+    __tablename__ = 'archivos_telegram'
+    id = db.Column(db.Integer, primary_key=True)
+    message_id = db.Column(db.Integer)
+    channel_id = db.Column(db.String(100))
+    file_name = db.Column(db.String(255))
+    file_type = db.Column(db.String(50))
+    cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.id'))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -277,11 +292,11 @@ if __name__ == '__main__':
     with app.app_context():
         try:
             auto_upgrade_db()
-            admin = Usuario.query.filter_by(username='tecnoplus').first()
+            admin = Usuario.query.filter_by(username=os.environ.get('ADMIN_USERNAME')).first()
             if not admin:
                 admin = Usuario(
-                    username='tecnoplus',
-                    password_hash=generate_password_hash('admintecno')
+                    username=os.environ.get('ADMIN_USERNAME'),
+                    password_hash=generate_password_hash(os.environ.get('ADMIN_PASSWORD'))
                 )
                 db.session.add(admin)
                 db.session.commit()
